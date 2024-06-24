@@ -4,6 +4,8 @@ const resultsModal = new bootstrap.Modal(document.getElementById("resultsModal")
 
 document.getElementById("status").addEventListener("click", e => getStatus(e)); /**this is our button we are adding a click event listener to it then calling the get status function */
 
+document.getElementById("submit").addEventListener("click", e => postForm(e)); // This wires up our checks button
+
 
 /** Tasks our get status needs to do
  * 1. It needs to make a  GET request to the API_URL with the API_KEY.
@@ -56,4 +58,33 @@ async function getStatus(e) {
         document.getElementById("results-content").innerHTML = results;
         resultsModal.show();
     
+    }
+
+    /** POST method
+     * We need two functions:
+     * Function to make request
+     * Function to display the data
+     * 
+     * So we need to get the form data and post it to api first
+     */
+
+/**Async so we can await the results of our promise */
+
+
+    async function postForm(e) {
+
+        /** FormData captures all the fields in a form and return it as an object, we can test this using the following: 
+        const form = new FormData(document.getElementById("checksform"));// checksform is the form id
+        for (let e of form.entries()){
+            console.log(e);
+        }
+            */
+        const form = new FormData(document.getElementById("checksform"))
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": API_KEY,
+            },
+            body: form,
+        });
     }
