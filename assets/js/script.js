@@ -25,10 +25,14 @@ async function getStatus(e) {
         If it returns an error code, then the “ok” property will be set to false.
     */
     if (response.ok) {
-        console.log(data.expiry);
+        console.log(data);  // the data.expiry shows just the expiry date 
+    } else {
+        throw new Error(data.error);
     }
 
 }
+
+
 /**Note
  *  When we’re handling promises, we have two ways of doing it.
     We can chain “.then”s as we did before, 
@@ -41,3 +45,15 @@ async function getStatus(e) {
     "expiry": "24-06-2025",
     "status_code": 200
 } */
+
+    function displayStatus(data) {
+
+        let heading = "API Key Status";
+        let results = `<div>Your key is valid until</div>`;
+        results += `<div class="key-status">${data.expiry}</div>`;
+    
+        document.getElementById("resultsModalTitle").innerText = heading;
+        document.getElementById("results-content").innerHTML = results;
+        resultsModal.show();
+    
+    }
