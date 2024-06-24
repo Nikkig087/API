@@ -25,9 +25,9 @@ async function getStatus(e) {
         If it returns an error code, then the “ok” property will be set to false.
     */
     if (response.ok) {
-        console.log(data);  // the data.expiry shows just the expiry date 
+        displayStatus(data);  // the data.expiry shows just the expiry date 
     } else {
-        throw new Error(data.error);
+        throw new Error(data.error); //data.error is the discriptive method from the json returned
     }
 
 }
