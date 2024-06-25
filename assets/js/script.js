@@ -6,6 +6,21 @@ document.getElementById("status").addEventListener("click", e => getStatus(e)); 
 
 document.getElementById("submit").addEventListener("click", e => postForm(e)); // This wires up our checks button
 
+function processOptions(form) {
+    let optArray = [];
+
+    for (let e of form.entries()) {
+        if (e[0] === "options") {
+            optArray.push(e[1]);
+        }
+    }
+
+    form.delete("options");
+
+    form.append("options", optArray.join());
+
+    return form;
+}
 
 /** Tasks our get status needs to do
  * 1. It needs to make a  GET request to the API_URL with the API_KEY.
@@ -29,6 +44,7 @@ async function getStatus(e) {
     if (response.ok) {
         displayStatus(data);  // the data.expiry shows just the expiry date 
     } else {
+        displayException(data);
         throw new Error(data.error); //data.error is the discriptive method from the json returned
     }
 
@@ -47,7 +63,7 @@ async function getStatus(e) {
     "expiry": "24-06-2025",
     "status_code": 200
 } */
-    function displayErrors(data) {
+function displayErrors(data) {
 
         let results = "";
     
@@ -62,19 +78,20 @@ async function getStatus(e) {
                 results += `<div class="error">${error.error}</div>`;
             }
         }
+
     
-        document.getElementById("resultsModalTitle").innerText = heading;
+        document.getElementById("resultsModalTitle").innerHTML = heading;
         document.getElementById("results-content").innerHTML = results;
         resultsModal.show();
     }
 
-    function displayStatus(data) {
+function displayStatus(data) {
 
         let heading = "API Key Status";
         let results = `<div>Your key is valid until</div>`;
         results += `<div class="key-status">${data.expiry}</div>`;
     
-        document.getElementById("resultsModalTitle").innerText = heading;
+        document.getElementById("resultsModalTitle").innerHTML = heading;
         document.getElementById("results-content").innerHTML = results;
         resultsModal.show();
     
@@ -91,7 +108,7 @@ async function getStatus(e) {
 /**Async so we can await the results of our promise */
 
 
-    async function postForm(e) {
+async function postForm(e) {
 
         /** FormData captures all the fields in a form and return it as an object, we can test this using the following: 
         const form = new FormData(document.getElementById("checksform"));// checksform is the form id
@@ -99,7 +116,7 @@ async function getStatus(e) {
             console.log(e);
         }
             */
-        const form = new FormData(document.getElementById("checksform"))
+        const form = processOptions(new FormData(document.getElementById("checksform")));
         const response = await fetch(API_URL, {
             method: "POST",
             headers: {
@@ -112,6 +129,23 @@ async function getStatus(e) {
             displayErrors(data)
         }
         else
-        {throw new Error(data.error)}
+        {   
+            displayException(data);
+            throw new Error(data.error);
+        }
         
+    }
+
+    // this function needs to be called before places we have throw new Error
+    function displayException(data) {
+
+        let heading = `<div class="error-heading">An Exception Occurred</div>`;
+    
+        results = `<div>The API returned status code ${data.status_code}</div>`;
+        results += `<div>Error number: <strong>${data.error_no}</strong></div>`;
+        results += `<div>Error text: <strong>${data.error}</strong></div>`;
+    
+        document.getElementById("resultsModalTitle").innerHTML = heading;
+        document.getElementById("results-content").innerHTML = results;
+        resultsModal.show();
     }
